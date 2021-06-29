@@ -136,7 +136,11 @@ function flag(){
   if(warning===lim){
     alert("You once again violated the rule. Sorry you are disqualified from this event")
     //document.getElementById('sandq').click()
-  }else{
+  }else if(warning>lim){
+    alert("You once again violated the rule. Sorry you are disqualified from this event")
+    //document.getElementById('sandq').click()
+  }
+  else{
     alert("You are violated the rule. dont try to malpractice, if you again violate the rule you will be disqualify from Spectrum War")
   }
 }
