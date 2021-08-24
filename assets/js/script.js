@@ -1,29 +1,27 @@
-
 function addEvent(obj, evType, fn, isCapturing){
   if (isCapturing==null) isCapturing=false; 
   if (obj.addEventListener){
-        // Firefox
-      obj.addEventListener(evType, fn, isCapturing);
-      return true;
+    // Firefox
+    obj.addEventListener(evType, fn, isCapturing);
+    return true;
   } else if (obj.attachEvent){
-      // MSIE
-      var r = obj.attachEvent('on'+evType, fn);
-      return r;
+    // MSIE
+    var r = obj.attachEvent('on'+evType, fn);
+    return r;
   } else {
-      return false;
+    return false;
   }
 }
 
-  // register to the potential page visibility change
-addEvent(document, "potentialvisilitychange", function(event) {
-  //console.log("potentialVisilityChange: potentialHidden="+document.potentialHidden+", document.potentiallyHiddenSince="+document.potentiallyHiddenSince+" s");
-  if(document.potentialHidden){
-      //console.log(document.potentialHidden)
-      tflag()
+// register to the potential page visibility change
+addEvent(document, "potentialvisilitychange", function(event) { //trigger the function when the visibility change detected
+  console.log("potentialVisilityChange: potentialHidden="+document.potentialHidden+", document.potentiallyHiddenSince="+document.potentiallyHiddenSince);
+  if(document.potentialHidden==true){
+    vflag()
   }
 });
 
-  // register to the W3C Page Visibility API
+// register to the W3C Page Visibility API
 var hidden=null;
 var visibilityChange=null;
 if (typeof document.mozHidden !== "undefined") {
@@ -39,97 +37,87 @@ if (typeof document.mozHidden !== "undefined") {
   hidden="hidden";
   visibilityChange="visibilitychange";
 }
-
-if (hidden!=null && visibilityChange!=null) {  // Tab switch Detection
-  addEvent(document, visibilityChange, function(event) {
-      if(document[hidden]){
-          vflag()
-      }
+if (hidden!=null && visibilityChange!=null) {
+  addEvent(document, visibilityChange, function(event) { //trigger the function when the tabswitch or app switch detected
+    console.log(visibilityChange+": "+hidden+"="+document[hidden]);   
+    if(document[hidden]){
+      tflag()
+    }
   });
 }
-
-
-//-------------------------------------------------------------------
 
 var potentialPageVisibility = {
   pageVisibilityChangeThreshold:3*3600, // in seconds
   init:function() {
-      function setAsNotHidden() {
-          var dispatchEventRequired=document.potentialHidden;
-          document.potentialHidden=false;
-          document.potentiallyHiddenSince=0;
-          if (dispatchEventRequired) dispatchPageVisibilityChangeEvent();
-      }
-
-      function initPotentiallyHiddenDetection() {
-          if (!hasFocusLocal) {
-          // the window does not has the focus => check for  user activity in the window
-          lastActionDate=new Date();
-          if (timeoutHandler!=null) {
-          clearTimeout(timeoutHandler);
-          }
-          timeoutHandler = setTimeout(checkPageVisibility, potentialPageVisibility.pageVisibilityChangeThreshold*1000+100); // +100 ms to avoid rounding issues under Firefox
-          }
-      }
-
-      function dispatchPageVisibilityChangeEvent() {
-          unifiedVisilityChangeEventDispatchAllowed=false;
-          var evt = document.createEvent("Event");
-          evt.initEvent("potentialvisilitychange", true, true);
-          document.dispatchEvent(evt);
-      }
-
-      function checkPageVisibility() {
-          var potentialHiddenDuration=(hasFocusLocal || lastActionDate==null?0:Math.floor((new Date().getTime()-lastActionDate.getTime())/1000));
-          document.potentiallyHiddenSince=potentialHiddenDuration;
-          if (potentialHiddenDuration>=potentialPageVisibility.pageVisibilityChangeThreshold && !document.potentialHidden) {
-            document.potentialHidden=true;
-            dispatchPageVisibilityChangeEvent();
-          }
-      }
-
-      var lastActionDate=null;
-      var hasFocusLocal=true;
-      var hasMouseOver=true;
+    function setAsNotHidden() {
+      var dispatchEventRequired=document.potentialHidden;
       document.potentialHidden=false;
       document.potentiallyHiddenSince=0;
-      var timeoutHandler = null;
-      
-      addEvent(document, "pageshow", function(event) {
-          document.getElementById("x").innerHTML+="pageshow/doc:<br>";
-      });
-      addEvent(document, "pagehide", function(event) {
-          document.getElementById("x").innerHTML+="pagehide/doc:<br>";
-      });
-      addEvent(window, "pageshow", function(event) {
-          // raised when the page first shows
-      });
-      addEvent(window, "pagehide", function(event) {
-          // not raised
-      });
-      addEvent(document, "mousemove", function(event) {
-          lastActionDate=new Date();
-      });
-      addEvent(document, "mouseover", function(event) {
-          hasMouseOver=true;
-          setAsNotHidden();
-      });
-      addEvent(document, "mouseout", function(event) {
-          hasMouseOver=false;
-          initPotentiallyHiddenDetection();
-      });
-      addEvent(window, "blur", function(event) {
-          hasFocusLocal=false;
-          initPotentiallyHiddenDetection();
-      });
-      addEvent(window, "focus", function(event) {
-          hasFocusLocal=true;
-          setAsNotHidden();
-      });
-        setAsNotHidden();
+      if (dispatchEventRequired) dispatchPageVisibilityChangeEvent();
+    }
+
+    function initPotentiallyHiddenDetection() {
+      if (!hasFocusLocal) {
+        // the window does not has the focus => check for  user activity in the window
+        lastActionDate=new Date();
+        if (timeoutHandler!=null) {
+          clearTimeout(timeoutHandler);
+        }
+        timeoutHandler = setTimeout(checkPageVisibility, potentialPageVisibility.pageVisibilityChangeThreshold*1000+100); // +100 ms to avoid rounding issues under Firefox
+      }
+    }
+
+    function dispatchPageVisibilityChangeEvent() {
+      unifiedVisilityChangeEventDispatchAllowed=false;
+      var evt = document.createEvent("Event");
+      evt.initEvent("potentialvisilitychange", true, true);
+      document.dispatchEvent(evt);
+    }
+
+    function checkPageVisibility() {
+      var potentialHiddenDuration=(hasFocusLocal || lastActionDate==null?0:Math.floor((new Date().getTime()-lastActionDate.getTime())/1000));
+                                    document.potentiallyHiddenSince=potentialHiddenDuration;
+      if (potentialHiddenDuration>=potentialPageVisibility.pageVisibilityChangeThreshold && !document.potentialHidden) {
+        // page visibility change threshold raiched => raise the even
+        document.potentialHidden=true;
+        dispatchPageVisibilityChangeEvent();
+      }
+    }
+
+    var lastActionDate=null;
+    var hasFocusLocal=true;
+    var hasMouseOver=true;
+    document.potentialHidden=false;
+    document.potentiallyHiddenSince=0;
+    var timeoutHandler = null;
+
+    /*
+    addEvent(document, "mousemove", function(event) {
+      lastActionDate=new Date();
+    });
+    addEvent(document, "mouseover", function(event) {
+      hasMouseOver=true;
+      setAsNotHidden();
+    });
+    addEvent(document, "mouseout", function(event) {
+      hasMouseOver=false;
+      initPotentiallyHiddenDetection();
+    });
+    */
+    addEvent(window, "blur", function(event) {
+      hasFocusLocal=false;
+      initPotentiallyHiddenDetection();
+    });
+    addEvent(window, "focus", function(event) {
+      hasFocusLocal=true;
+      setAsNotHidden();
+    });
+    setAsNotHidden();
   }
 }
 
+potentialPageVisibility.pageVisibilityChangeThreshold=2; // 2 seconds for testing
+potentialPageVisibility.init();
 
 var tf=0
 var vf=0
@@ -144,8 +132,8 @@ function vflag(){
   console.log(vf)
 }
 
-potentialPageVisibility.pageVisibilityChangeThreshold=2; // 4 seconds for testing
-potentialPageVisibility.init();
+//---Timer---
+
 
 // Set the date we're counting down to
 end_time="Aug 24, 2021 15:00:00" //pass the variable from backend when the times end
