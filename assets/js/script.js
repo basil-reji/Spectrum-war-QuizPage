@@ -19,7 +19,7 @@ addEvent(document, "potentialvisilitychange", function(event) {
   //console.log("potentialVisilityChange: potentialHidden="+document.potentialHidden+", document.potentiallyHiddenSince="+document.potentiallyHiddenSince+" s");
   if(document.potentialHidden){
       //console.log(document.potentialHidden)
-      flag()
+      tflag()
   }
 });
 
@@ -43,7 +43,7 @@ if (typeof document.mozHidden !== "undefined") {
 if (hidden!=null && visibilityChange!=null) {  // Tab switch Detection
   addEvent(document, visibilityChange, function(event) {
       if(document[hidden]){
-          flag()
+          vflag()
       }
   });
 }
@@ -129,20 +129,47 @@ var potentialPageVisibility = {
         setAsNotHidden();
   }
 }
-var warning=0
-var lim=2
-function flag(){
-  warning+=1
-  if(warning===lim){
-    alert("You once again violated the rule. Sorry you are disqualified from this event")
-    //document.getElementById('sandq').click()
-  }else if(warning>lim){
-    alert("You once again violated the rule. Sorry you are disqualified from this event")
-    //document.getElementById('sandq').click()
-  }
-  else{
-    alert("You are violated the rule. dont try to malpractice, if you again violate the rule you will be disqualify from Spectrum War")
-  }
+
+
+var tf=0
+var vf=0
+
+function tflag(){
+  tf+=1
+  console.log(tf)
 }
-potentialPageVisibility.pageVisibilityChangeThreshold=4; // 4 seconds for testing
+
+function vflag(){
+  vf+=1
+  console.log(vf)
+}
+
+potentialPageVisibility.pageVisibilityChangeThreshold=2; // 4 seconds for testing
 potentialPageVisibility.init();
+
+// Set the date we're counting down to
+end_time="Aug 24, 2021 15:00:00" //pass the variable from backend when the times end
+var countDownDate = new Date(end_time).getTime();
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+    var now = new Date().getTime();
+  // Find the distance between now and the count down date
+    var distance =countDownDate - now;
+
+  // Time calculations for days, hours, minutes and seconds
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  // Display the result in the element with id="demo"
+    document.getElementById("timer").innerHTML = minutes + "m " + seconds + "s ";
+
+  // If the count down is finished, write some text
+    if (distance < 0) {
+        clearInterval(x);
+        document.getElementById("demo").innerHTML = "0m 0s";
+        console.log("Times UP")
+        document.getElementById('san').click()
+    }
+}, 1000);
