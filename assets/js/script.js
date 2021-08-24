@@ -15,7 +15,7 @@ function addEvent(obj, evType, fn, isCapturing){
 
 // register to the potential page visibility change
 addEvent(document, "potentialvisilitychange", function(event) { //trigger the function when the visibility change detected
-  //console.log("potentialVisilityChange: potentialHidden="+document.potentialHidden+", document.potentiallyHiddenSince="+document.potentiallyHiddenSince);
+  
   if(document.potentialHidden==true){
     vflag()
   }
@@ -39,7 +39,7 @@ if (typeof document.mozHidden !== "undefined") {
 }
 if (hidden!=null && visibilityChange!=null) {
   addEvent(document, visibilityChange, function(event) { //trigger the function when the tabswitch or app switch detected
-    //console.log(visibilityChange+": "+hidden+"="+document[hidden]);   
+       
     if(document[hidden]){
       tflag()
     }
@@ -86,24 +86,10 @@ var potentialPageVisibility = {
 
     var lastActionDate=null;
     var hasFocusLocal=true;
-    var hasMouseOver=true;
     document.potentialHidden=false;
     document.potentiallyHiddenSince=0;
     var timeoutHandler = null;
 
-    /*
-    addEvent(document, "mousemove", function(event) {
-      lastActionDate=new Date();
-    });
-    addEvent(document, "mouseover", function(event) {
-      hasMouseOver=true;
-      setAsNotHidden();
-    });
-    addEvent(document, "mouseout", function(event) {
-      hasMouseOver=false;
-      initPotentiallyHiddenDetection();
-    });
-    */
     addEvent(window, "blur", function(event) {
       hasFocusLocal=false;
       initPotentiallyHiddenDetection();
@@ -123,12 +109,11 @@ var tf=0
 var vf=0
 
 function tflag(){
-  tf+=1
-  console.log(tf)
+  tf+=1 // tabswitch count
 }
 
 function vflag(){
-  vf+=1
+  vf+=1 // focus change count
   console.log(vf)
 }
 
