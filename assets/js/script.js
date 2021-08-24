@@ -15,7 +15,7 @@ function addEvent(obj, evType, fn, isCapturing){
 
 // register to the potential page visibility change
 addEvent(document, "potentialvisilitychange", function(event) { //trigger the function when the visibility change detected
-  console.log("potentialVisilityChange: potentialHidden="+document.potentialHidden+", document.potentiallyHiddenSince="+document.potentiallyHiddenSince);
+  //console.log("potentialVisilityChange: potentialHidden="+document.potentialHidden+", document.potentiallyHiddenSince="+document.potentiallyHiddenSince);
   if(document.potentialHidden==true){
     vflag()
   }
@@ -39,7 +39,7 @@ if (typeof document.mozHidden !== "undefined") {
 }
 if (hidden!=null && visibilityChange!=null) {
   addEvent(document, visibilityChange, function(event) { //trigger the function when the tabswitch or app switch detected
-    console.log(visibilityChange+": "+hidden+"="+document[hidden]);   
+    //console.log(visibilityChange+": "+hidden+"="+document[hidden]);   
     if(document[hidden]){
       tflag()
     }
